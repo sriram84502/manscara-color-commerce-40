@@ -29,12 +29,12 @@ export default {
         accent: "#8E9196",
         white: "#FAFAF7",
         grayish: "#bab7ae",
-        // Custom Tailwind with CSS variable-based color utilities
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        // CSS variable-based color utilities with DEFAULT keys
+        border: { DEFAULT: "hsl(var(--border))" },
+        input: { DEFAULT: "hsl(var(--input))" },
+        ring: { DEFAULT: "hsl(var(--ring))" },
+        background: { DEFAULT: "hsl(var(--background))" },
+        foreground: { DEFAULT: "hsl(var(--foreground))" },
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -59,7 +59,7 @@ export default {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
         },
-        accent: {
+        accentVar: { // renamed to avoid duplicate 'accent' key
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
@@ -85,4 +85,3 @@ export default {
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
-
