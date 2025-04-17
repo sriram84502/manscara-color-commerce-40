@@ -21,7 +21,7 @@ export default {
         jakarta: ["Plus Jakarta Sans", "sans-serif"],
       },
       colors: {
-        // Inspired by the product
+        // Default palette for the project
         beige: "#EFE1C3",
         black: "#1A1D1A",
         charcoal: "#232323",
@@ -29,6 +29,40 @@ export default {
         accent: "#8E9196",
         white: "#FAFAF7",
         grayish: "#bab7ae",
+        // Custom Tailwind with CSS variable-based color utilities
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -51,3 +85,4 @@ export default {
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+
