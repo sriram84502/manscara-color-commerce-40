@@ -18,7 +18,7 @@ const HeroSection = () => {
         <div className="h-full w-full bg-gradient-to-br from-[#f5f5f5] to-[#e2d1c3] opacity-75"></div>
       </div>
       
-      <div className="relative z-10 flex h-full flex-col-reverse md:flex-row items-center px-4 py-8 md:px-16 md:py-0">
+      <div className="relative z-10 flex min-h-[100dvh] flex-col-reverse md:flex-row items-center justify-center px-4 py-8 md:px-16 md:py-0">
         <div className="w-full md:max-w-2xl space-y-4 md:space-y-6 text-center md:text-left">
           <h1
             ref={titleRef as React.RefObject<HTMLHeadingElement>}
