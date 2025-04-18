@@ -8,13 +8,9 @@ const HeroSection = () => {
   const [imgRef, imgAnim] = useScrollReveal("animate-fade-in", 400);
 
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-[#f5f5f5]">
+    <section className="relative h-screen w-full overflow-hidden bg-gradient-to-br from-[#f5f5f5] to-[#e2d1c3]">
       <div className="absolute inset-0">
-        <img
-          src="/lovable-uploads/d1c2087b-9db9-4b49-9fbc-9fd3159c3a6e.png"
-          alt="Manscara Face Wash Background"
-          className="h-full w-full object-cover"
-        />
+        <div className="h-full w-full bg-gradient-to-br from-[#f5f5f5] to-[#e2d1c3] opacity-75"></div>
       </div>
       
       <div className="relative z-10 flex h-full items-center px-6 md:px-16">
