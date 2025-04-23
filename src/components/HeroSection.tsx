@@ -1,64 +1,50 @@
 
-import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { ShoppingCart, Star } from "lucide-react";
 import CTAButtons from "./CTAButtons";
-import { Star } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const HeroSection = () => {
-  const isMobile = useIsMobile();
-  const [titleRef, titleAnim] = useScrollReveal("animate-fade-in-up", 100);
-  const [subtitleRef, subtitleAnim] = useScrollReveal("animate-fade-in-up", 200);
-  const [taglineRef, taglineAnim] = useScrollReveal("animate-fade-in-up", 300);
-  const [imgRef, imgAnim] = useScrollReveal("animate-fade-in", 400);
-  const [ratingRef, ratingAnim] = useScrollReveal("animate-fade-in-up", 500);
+  const [sectionRef, sectionAnim] = useScrollReveal("animate-fade-in", 0);
+  const [headingRef, headingAnim] = useScrollReveal("animate-fade-in-up", 100);
+  const [pRef, pAnim] = useScrollReveal("animate-fade-in-up", 200);
+  const [btnRef, btnAnim] = useScrollReveal("animate-scale-in", 350);
+  const [imgRef, imgAnim] = useScrollReveal("animate-scale-in", 500);
 
   return (
-    <section className="relative min-h-[100dvh] w-full overflow-hidden bg-gradient-to-br from-[#f5f5f5] to-[#e2d1c3]">
-      <div className="absolute inset-0">
-        <div className="h-full w-full bg-gradient-to-br from-[#f5f5f5] to-[#e2d1c3] opacity-75"></div>
-      </div>
-      
-      <div className="relative z-10 flex min-h-[100dvh] flex-col-reverse md:flex-row items-center justify-center px-4 py-8 md:px-16 md:py-0">
-        <div className="w-full md:max-w-2xl space-y-4 md:space-y-6 text-center md:text-left">
+    <section
+      ref={sectionRef as React.RefObject<HTMLElement>}
+      className={`w-full bg-gradient-to-br from-beige to-sand py-12 md:py-20 font-jakarta relative overflow-hidden ${sectionAnim}`}
+      aria-label="Manscara Facewash hero"
+    >
+      <div className="container flex flex-col md:flex-row items-center gap-12">
+        <div className="flex-1 text-center md:text-left space-y-7">
           <h1
-            ref={titleRef as React.RefObject<HTMLHeadingElement>}
-            className={`text-3xl sm:text-4xl font-bold text-[#1A1F2C] md:text-6xl lg:text-7xl tracking-wider ${titleAnim}`}
+            ref={headingRef as React.RefObject<HTMLHeadingElement>}
+            className={`text-4xl md:text-5xl font-extrabold text-black leading-tight ${headingAnim}`}
           >
-            Reveal confidence in every wash
+            Reveal <span className="text-accent">confidence</span> in every wash,<br className="hidden md:inline"/> with <span className="text-black">Manscara Facewash</span>
           </h1>
-          <h2
-            ref={subtitleRef as React.RefObject<HTMLHeadingElement>}
-            className={`text-xl sm:text-2xl font-semibold text-[#1A1F2C] md:text-4xl tracking-wide ${subtitleAnim}`}
-          >
-            with Manscara Facewash
-          </h2>
           <p
-            ref={taglineRef as React.RefObject<HTMLParagraphElement>}
-            className={`text-base sm:text-lg text-[#8E9196] md:text-xl max-w-xl mx-auto md:mx-0 ${taglineAnim}`}
+            ref={pRef as React.RefObject<HTMLParagraphElement>}
+            className={`text-gray-500 text-lg font-medium max-w-xl mx-auto md:mx-0 ${pAnim}`}
           >
-            The modern solution for oily and acne-prone skin — oil control, clarifying & uniquely crafted for bold skin health.
+            The modern solution for oily and acne-prone skin &mdash; oil control, clarifying & uniquely crafted for bold skin health.
           </p>
-          
-          <CTAButtons />
-          
-          <div 
-            ref={ratingRef as React.RefObject<HTMLDivElement>}
-            className={`flex items-center gap-2 mt-6 justify-center md:justify-start ${ratingAnim}`}
-          >
-            <div className="flex items-center">
-              <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-              <span className="ml-1 text-xl font-bold text-[#1A1F2C]">4.8/5</span>
-            </div>
-            <span className="text-[#8E9196]">(192 reviews)</span>
+          <div ref={btnRef as React.RefObject<HTMLDivElement>} className={btnAnim}>
+            <CTAButtons />
+          </div>
+          <div className={`flex items-center gap-2 pt-2 justify-center md:justify-start`}>
+            <Star className="w-5 h-5 text-yellow-500" />
+            <span className="text-base text-black font-bold">4.8/5</span>
+            <span className="text-accent ml-1">(192 reviews)</span>
           </div>
         </div>
-
-        <div className={`w-full md:w-[320px] md:absolute md:right-6 md:bottom-6 lg:right-16 lg:bottom-16 mb-8 md:mb-0 ${isMobile ? 'px-8' : ''}`}>
+        <div className="flex-1 flex justify-center">
           <img
             ref={imgRef as React.RefObject<HTMLImageElement>}
             src="https://preview--manscara-color-commerce.lovable.app/lovable-uploads/24c4d1a3-6643-4f72-9433-7d1f90d36d85.png"
-            alt="Product shot of Manscara Facewash for men"
-            className={`w-full object-contain ${imgAnim}`}
+            alt="Product shot of Manscara Facewash for men, solution for oily and acne-prone skin"
+            className={`w-[320px] h-[400px] object-contain rounded-xl shadow-card bg-gradient-to-t from-sand to-beige border-2 border-beige hover:scale-105 transition-transform duration-300 ${imgAnim}`}
             draggable={false}
           />
         </div>
