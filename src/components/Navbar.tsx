@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Home, FileText, User, LogOut } from "lucide-react";
+import Cookies from "js-cookie";
 
 const Navbar = () => {
   const [user, setUser] = useState<any>(null);
@@ -10,12 +11,12 @@ const Navbar = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const stored = localStorage.getItem("manscara_current_user");
-    setUser(stored ? JSON.parse(stored) : null);
+    const userCookie = Cookies.get('manscara_current_user');
+    setUser(userCookie ? JSON.parse(userCookie) : null);
   }, []);
 
   function handleLogout() {
-    localStorage.removeItem("manscara_current_user");
+    Cookies.remove('manscara_current_user');
     setUser(null);
     navigate("/");
   }
@@ -80,4 +81,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

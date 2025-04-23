@@ -1,11 +1,12 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { LogIn, Mail, Shield, User } from "lucide-react";
+import { LogIn, Mail, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Cookies from "js-cookie";
 
 function getPasswordStrength(pw: string) {
   let score = 0;
@@ -44,7 +45,9 @@ const Login = () => {
       setError("No such user / incorrect password.");
       return;
     }
-    localStorage.setItem("manscara_current_user", JSON.stringify(user));
+    
+    // Set cookie with user data - expires in 7 days
+    Cookies.set('manscara_current_user', JSON.stringify(user), { expires: 7 });
     navigate("/");
   }
 
@@ -113,4 +116,5 @@ const Login = () => {
     </div>
   );
 };
+
 export default Login;
