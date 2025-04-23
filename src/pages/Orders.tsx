@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -57,7 +56,7 @@ const Orders = () => {
     const token = localStorage.getItem("manscara_token");
     
     if (!token) {
-      setIsLoading(false);
+      navigate("/login");
       return;
     }
     
@@ -72,7 +71,6 @@ const Orders = () => {
           variant: "destructive"
         });
         
-        // If unauthorized, redirect to login
         if (err.message?.includes("401")) {
           navigate("/login");
         }
@@ -131,21 +129,23 @@ const Orders = () => {
       <Navbar />
       <div className="container max-w-2xl mx-auto py-12 flex-1">
         <h2 className="text-3xl font-bold text-black mb-4">Your Orders</h2>
-        <div className="p-6 bg-white rounded-lg shadow-card border border-beige text-gray-600">
+        <div className="p-6 bg-white rounded-lg shadow-card border border-beige">
           {isLoading ? (
             <div className="text-center py-10">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-accent border-t-transparent"></div>
               <p className="mt-2">Loading your orders...</p>
             </div>
           ) : orders.length === 0 ? (
-            <>
-              <p className="mb-2">No orders found. Order now!</p>
-              <div className="grid place-items-center">
-                <Button className="bg-black text-beige px-6 py-2 rounded-md font-semibold hover:bg-accent hover:text-black transition-all" asChild>
-                  <a href="/checkout">Order Now</a>
-                </Button>
-              </div>
-            </>
+            <div className="text-center py-10">
+              <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 mb-4">No orders found</p>
+              <Button
+                className="bg-black text-beige hover:bg-accent transition-all"
+                onClick={() => navigate("/checkout")}
+              >
+                Place Your First Order
+              </Button>
+            </div>
           ) : (
             <div className="flex flex-col gap-5">
               {orders.map(order => (

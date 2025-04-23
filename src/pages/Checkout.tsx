@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Plus, Minus } from "lucide-react";
 import Navbar from "@/components/Navbar";
@@ -53,22 +52,21 @@ const Checkout = () => {
             price: 299
           }
         ],
-        shippingAddress: user.address,
+        shippingAddress: user.address || "",
         totalAmount: total
       };
       
-      await api.orders.create(orderData);
+      const response = await api.orders.create(orderData);
       
-      setConfirm(true);
-      toast({
-        title: "Order placed successfully!",
-        description: "You can track your order in the Orders page"
+      // Navigate to payment page with order details
+      navigate("/payment", { 
+        state: { 
+          orderId: response.orderId,
+          amount: total,
+          items: orderData.orderItems
+        } 
       });
-      
-      setTimeout(() => {
-        setConfirm(false);
-        navigate("/orders");
-      }, 1500);
+
     } catch (err: any) {
       toast({
         title: "Failed to place order",
