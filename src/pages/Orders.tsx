@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -63,8 +64,28 @@ const Orders = () => {
     const fetchOrders = async () => {
       try {
         const response = await api.orders.getHistory();
-        setOrders(response);
+        console.log("Orders response:", response); // Debug log
+        
+        // Ensure the response is an array with required fields
+        if (Array.isArray(response)) {
+          // Make sure each order has the required fields, especially orderItems as an array
+          const validOrders = response.map(order => ({
+            ...order,
+            orderItems: Array.isArray(order.orderItems) ? order.orderItems : [],
+          }));
+          
+          setOrders(validOrders);
+        } else {
+          console.error("Invalid orders response format:", response);
+          toast({
+            title: "Data format error",
+            description: "Received invalid data format from server",
+            variant: "destructive"
+          });
+          setOrders([]);
+        }
       } catch (err: any) {
+        console.error("Error fetching orders:", err);
         toast({
           title: "Failed to fetch orders",
           description: err.message || "Please try again later",
@@ -124,6 +145,14 @@ const Orders = () => {
     return new Date(dateString).toLocaleString();
   };
 
+  // Safe function to count items
+  const countItems = (order: Order) => {
+    if (!order.orderItems || !Array.isArray(order.orderItems)) {
+      return 0;
+    }
+    return order.orderItems.reduce((sum, item) => sum + (item?.quantity || 0), 0);
+  };
+
   return (
     <div className="min-h-screen bg-beige font-jakarta flex flex-col">
       <Navbar />
@@ -157,7 +186,7 @@ const Orders = () => {
                     <span className="text-xs text-gray-500">{formatDate(order.createdAt)}</span>
                   </div>
                   <div className="flex items-center gap-4 mb-1">
-                    <span>Items: <b>{order.orderItems.reduce((sum, item) => sum + item.quantity, 0)}</b></span>
+                    <span>Items: <b>{countItems(order)}</b></span>
                     <span>Total: <b>₹{order.totalAmount}</b></span>
                   </div>
                   <div className="flex items-center gap-2 text-xs mb-2">
