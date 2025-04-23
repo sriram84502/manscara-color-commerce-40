@@ -1,12 +1,19 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Plus, Minus } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { v4 as uuidv4 } from "uuid"; // For unique order ids
-import { useEffect } from "react";
+import { api } from "@/utils/api";
+import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+
 const Checkout = () => {
   const [qty, setQty] = useState(1);
   const [confirm, setConfirm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   // Animate the total / product card when quantity changes
   const [animKey, setAnimKey] = useState(0);
@@ -21,25 +28,56 @@ const Checkout = () => {
 
   const total = qty * 299;
 
-  function placeOrder() {
-    const u = localStorage.getItem("manscara_current_user");
-    if (!u) {
-      alert("Please login to place an order.");
+  async function placeOrder() {
+    const userCookie = Cookies.get('manscara_current_user');
+    if (!userCookie) {
+      toast({
+        title: "Login required",
+        description: "Please login to place an order",
+        variant: "destructive"
+      });
+      navigate("/login");
       return;
     }
-    const user = JSON.parse(u);
-    const orders = JSON.parse(localStorage.getItem("manscara_orders") || "[]");
-    const order = {
-      id: uuidv4(),
-      email: user.email,
-      qty,
-      total,
-      address: user.address,
-      date: new Date().toLocaleString(),
-    };
-    localStorage.setItem("manscara_orders", JSON.stringify([order, ...orders]));
-    setConfirm(true);
-    setTimeout(() => setConfirm(false), 1500);
+    
+    const user = JSON.parse(userCookie);
+    
+    setIsLoading(true);
+    try {
+      const orderData = {
+        orderItems: [
+          {
+            productId: "manscara001",
+            name: "Manscara Facewash (100mL)",
+            quantity: qty,
+            price: 299
+          }
+        ],
+        shippingAddress: user.address,
+        totalAmount: total
+      };
+      
+      await api.orders.create(orderData);
+      
+      setConfirm(true);
+      toast({
+        title: "Order placed successfully!",
+        description: "You can track your order in the Orders page"
+      });
+      
+      setTimeout(() => {
+        setConfirm(false);
+        navigate("/orders");
+      }, 1500);
+    } catch (err: any) {
+      toast({
+        title: "Failed to place order",
+        description: err.message || "Please try again later",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -64,13 +102,14 @@ const Checkout = () => {
                   aria-label="Decrease quantity"
                   className="rounded-full bg-beige text-black font-bold w-7 h-7 flex items-center justify-center border border-gray-300 hover:scale-110 hover:bg-accent transition-all"
                   onClick={() => handleChange(-1)}
-                  disabled={qty === 1}
+                  disabled={qty === 1 || isLoading}
                   type="button"
                 ><Minus className="w-4 h-4" /></button>
                 <button
                   aria-label="Increase quantity"
                   className="rounded-full bg-beige text-black font-bold w-7 h-7 flex items-center justify-center border border-gray-300 hover:scale-110 hover:bg-accent transition-all"
                   onClick={() => handleChange(1)}
+                  disabled={isLoading}
                   type="button"
                 ><Plus className="w-4 h-4" /></button>
               </div>
@@ -78,11 +117,12 @@ const Checkout = () => {
             <span className="text-lg font-semibold text-black py-1 animate-fade-in">Total: ₹{total}</span>
           </div>
           <button
-            className="w-full mt-6 bg-black text-beige py-3 rounded-lg font-bold text-lg transition-all hover:scale-105 hover:bg-accent hover:text-black"
+            className="w-full mt-6 bg-black text-beige py-3 rounded-lg font-bold text-lg transition-all hover:scale-105 hover:bg-accent hover:text-black disabled:opacity-75 disabled:hover:scale-100 disabled:cursor-not-allowed"
             onClick={placeOrder}
             type="button"
+            disabled={isLoading}
           >
-            Place Order
+            {isLoading ? "Processing..." : "Place Order"}
           </button>
           {confirm && (
             <div className="text-green-500 font-bold text-center mt-2 animate-fade-in">

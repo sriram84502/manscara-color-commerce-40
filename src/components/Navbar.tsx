@@ -16,6 +16,9 @@ const Navbar = () => {
   }, []);
 
   function handleLogout() {
+    // Clear token
+    localStorage.removeItem("manscara_token");
+    // Clear user cookie
     Cookies.remove('manscara_current_user');
     setUser(null);
     navigate("/");

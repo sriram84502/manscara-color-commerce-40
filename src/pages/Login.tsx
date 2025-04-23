@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LogIn, Mail, Shield } from "lucide-react";
@@ -7,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Cookies from "js-cookie";
+import { api } from "@/utils/api";
+import { useToast } from "@/hooks/use-toast";
 
 function getPasswordStrength(pw: string) {
   let score = 0;
@@ -22,33 +23,40 @@ function getPasswordStrength(pw: string) {
   return { label: "Strong", color: "bg-green-200 text-green-800" };
 }
 
-const getUsers = () => {
-  try {
-    return JSON.parse(localStorage.getItem("manscara_users") || "[]");
-  } catch {
-    return [];
-  }
-};
-
 const Login = () => {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
   const pwStrength = getPasswordStrength(pw);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const users = getUsers();
-    const user = users.find((u: any) => u.email === email && u.pw === pw);
-    if (!user) {
-      setError("No such user / incorrect password.");
-      return;
-    }
+    setError("");
+    setIsLoading(true);
     
-    // Set cookie with user data - expires in 7 days
-    Cookies.set('manscara_current_user', JSON.stringify(user), { expires: 7 });
-    navigate("/");
+    try {
+      const response = await api.auth.login(email, pw);
+      
+      // Store token
+      localStorage.setItem("manscara_token", response.token);
+      
+      // Store user data in cookie - expires in 7 days
+      Cookies.set('manscara_current_user', JSON.stringify(response.user), { expires: 7 });
+      
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      });
+      
+      navigate("/");
+    } catch (err: any) {
+      setError(err.message || "Invalid email or password");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -72,6 +80,7 @@ const Login = () => {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
           {/* Password */}
@@ -84,6 +93,7 @@ const Login = () => {
                 value={pw}
                 onChange={e => setPw(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             {pw && (
@@ -102,8 +112,9 @@ const Login = () => {
         <Button
           type="submit"
           className="w-full bg-black text-beige font-bold rounded-lg hover:scale-105 hover:bg-accent transition-all"
+          disabled={isLoading}
         >
-          Sign In
+          {isLoading ? "Signing in..." : "Sign In"}
         </Button>
         <div className="text-center text-sm text-gray-600">
           Don&apos;t have an account?{" "}

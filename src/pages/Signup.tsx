@@ -1,26 +1,19 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserPlus, Mail, Phone, MapPin, User as UserIcon, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { api } from "@/utils/api";
+import Cookies from "js-cookie";
+import { useToast } from "@/hooks/use-toast";
 
 const placeholderAddress = {
   street: "13-6-3/1 RAMA CHANDRA RAO PETA",
   city: "TADEPALLIGUDEM",
   state: "ANDHRA PRADESH 534102",
-};
-
-const getUsers = () => {
-  try {
-    return JSON.parse(localStorage.getItem("manscara_users") || "[]");
-  } catch {
-    return [];
-  }
-};
-
-const saveUsers = (users: any[]) => {
-  localStorage.setItem("manscara_users", JSON.stringify(users));
 };
 
 function getPasswordStrength(pw: string) {
@@ -37,8 +30,6 @@ function getPasswordStrength(pw: string) {
   return { label: "Strong", color: "bg-green-200 text-green-800" };
 }
 
-import { Input } from "@/components/ui/input";
-
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -50,21 +41,22 @@ const Signup = () => {
   const [postalCode, setPostalCode] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const pwStrength = getPasswordStrength(pw);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const users = getUsers();
+    setError("");
+    setSuccess("");
+    
     if (!name.trim()) {
       setError("Please fill all fields.");
       return;
     }
-    if (users.find((u: any) => u.email === email)) {
-      setError("User already exists.");
-      return;
-    }
+    
     if (
       !street.trim() ||
       !city.trim() ||
@@ -77,17 +69,52 @@ const Signup = () => {
       setError("Please fill all fields.");
       return;
     }
+    
     if (pwStrength.label === "Weak") {
       setError("Password is too weak.");
       return;
     }
-    const address = `${street}, ${city}, ${stateValue}, ${postalCode}`;
-    const newUser = { name, email, pw, phone, address };
-    users.push(newUser);
-    saveUsers(users);
-    localStorage.setItem("manscara_current_user", JSON.stringify(newUser));
-    setSuccess("Signup successful! Redirecting...");
-    setTimeout(() => navigate("/"), 1300);
+    
+    setIsLoading(true);
+    
+    try {
+      const address = `${street}, ${city}, ${stateValue}, ${postalCode}`;
+      
+      // Register user with API
+      await api.auth.signup({
+        name,
+        email,
+        phone,
+        password: pw,
+      });
+      
+      // Log in after signup
+      const loginResponse = await api.auth.login(email, pw);
+      
+      // Store token
+      localStorage.setItem("manscara_token", loginResponse.token);
+      
+      // Store user data with address (API doesn't store address directly)
+      const userData = {
+        ...loginResponse.user,
+        address,
+      };
+      
+      // Set cookie with user data
+      Cookies.set('manscara_current_user', JSON.stringify(userData), { expires: 7 });
+      
+      setSuccess("Signup successful! Redirecting...");
+      toast({
+        title: "Account created successfully",
+        description: "Welcome to Manscara!",
+      });
+      
+      setTimeout(() => navigate("/"), 1300);
+    } catch (err: any) {
+      setError(err.message || "Failed to create account");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -111,6 +138,7 @@ const Signup = () => {
               value={name}
               onChange={e => setName(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
           {/* Email */}
@@ -122,6 +150,7 @@ const Signup = () => {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
           {/* Phone */}
@@ -133,6 +162,7 @@ const Signup = () => {
               value={phone}
               onChange={e => setPhone(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
           {/* Address fields: Street, City, State, Postal Code */}
@@ -147,6 +177,7 @@ const Signup = () => {
               autoComplete="street-address"
               maxLength={60}
               spellCheck="true"
+              disabled={isLoading}
             />
           </div>
           <div className="flex gap-2">
@@ -160,6 +191,7 @@ const Signup = () => {
                 required
                 maxLength={40}
                 spellCheck="true"
+                disabled={isLoading}
               />
             </div>
             <div className="flex items-center gap-2 w-1/2">
@@ -172,6 +204,7 @@ const Signup = () => {
                 required
                 maxLength={40}
                 spellCheck="true"
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -185,6 +218,7 @@ const Signup = () => {
               required
               maxLength={12}
               spellCheck="false"
+              disabled={isLoading}
             />
           </div>
           {/* Password */}
@@ -197,6 +231,7 @@ const Signup = () => {
                 value={pw}
                 onChange={e => setPw(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
             {pw && (
@@ -216,8 +251,9 @@ const Signup = () => {
         <Button
           type="submit"
           className="w-full font-bold rounded-lg bg-black text-beige hover:scale-105 hover:bg-accent transition-all"
+          disabled={isLoading}
         >
-          Create Account
+          {isLoading ? "Creating Account..." : "Create Account"}
         </Button>
         <div className="text-center text-sm text-gray-600">
           Already have an account?{" "}
