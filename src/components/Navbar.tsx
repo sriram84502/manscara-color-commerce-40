@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, FileText, User, LogOut } from "lucide-react";
+import { Home, FileText, User, LogOut, Settings } from "lucide-react";
 import Cookies from "js-cookie";
 
 const Navbar = () => {
@@ -61,6 +61,14 @@ const Navbar = () => {
             >
               <User className="w-5 h-5" />
               <span className="hidden sm:inline">Profile</span>
+            </Link>
+            <Link
+              to="/admin"
+              className={navLinkClasses(location.pathname.startsWith("/admin"))}
+              aria-label="Admin"
+            >
+              <Settings className="w-5 h-5" />
+              <span className="hidden sm:inline">Admin</span>
             </Link>
             <Button
               variant="outline"
